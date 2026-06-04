@@ -26,8 +26,13 @@ public class AuthController {
         if(bindingResult.hasErrors()){
             return "auth/signup";
         }
+        try{
+            userService.signup(signupRequest);
+        } catch (IllegalArgumentException e) {
+            bindingResult.rejectValue("loginId","duplicate",e.getMessage());
+            return "auth/signup";
+        }
 
-        userService.signup(signupRequest);
 
         return "redirect:/login";
     }

@@ -17,7 +17,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public void signup(SignupRequest request) {
-        if(userRepository.existsByLoginId(request.getPassword())){
+        if(userRepository.existsByLoginId(request.getLoginId())){
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
 
