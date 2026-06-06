@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 오류신고 목록</title>
+</head>
+<body>
+<h1>내 오류신고 목록</h1>
+
+<a th:href="@{/reports/new}">오류신고 등록</a>
+<a th:href="@{/}">메인으로</a>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>제목</th>
+        <th>처리상태</th>
+        <th>등록일시</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="report : ${reports}">
+        <td th:text="${report.id}">1</td>
+        <td th:text="${report.title}">제목</td>
+        <td th:text="${report.status}">처리상태</td>
+        <td th:text="${report.createdAt}">2026-05T10:00</td>
+    </tr>
+    </tbody>
+</table>
+
+<p th:if="${#lists.isEmpty(reports)}">등록된 오류신고가 없습니다.</p>
+
+</body>
+</html>
