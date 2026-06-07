@@ -55,4 +55,12 @@ public class ErrorReport {
         this.status = ReportStatus.RECEIVED;
         this.createdAt = LocalDateTime.now();
     }
+
+    public void answer(String answer, User admin){
+        this.answer = answer;
+        this.admin = admin;
+        this.status = ReportStatus.COMPLETED;
+        this.answeredAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

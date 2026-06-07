@@ -58,4 +58,13 @@ public class ErrorReportService {
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고입니다."));
     }
 
+    public void answerReport(Long reportId,String answer, String adminLoginId) {
+        ErrorReport report = errorReportRepository.findById(reportId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 오류신고입니다."));
+
+        User admin = userRepository.findByLoginId(adminLoginId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+
+        report.answer(answer, admin);
+    }
 }
