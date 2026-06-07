@@ -23,7 +23,10 @@
     <tr th:each="report : ${reports}">
         <td th:text="${report.id}">1</td>
         <td th:text="${report.user.name}">작성자</td>
-        <td th:text="${report.title}">제목</td>
+        <td>
+            <a th:href="@{/admin/reports/{id}(id=${report.id})}"
+               th:text="${report.title}">제목</a>
+        </td>
         <td th:text="${report.status}">처리상태</td>
         <td th:text="${report.createdAt}">2026-05T10:00</td>
     </tr>

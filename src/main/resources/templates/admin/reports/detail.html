@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 오류신고 상세</title>
+</head>
+<body>
+<h1>관리자 오류신고 상세</h1>
+
+<table border="1">
+    <tr>
+        <td>ID</td>
+        <td th:text="${report.id}">1</td>
+    </tr>
+    <tr>
+        <th>제목</th>
+        <td th:text="${report.title}">제목</td>
+    </tr>
+    <tr>
+        <th>내용</th>
+        <td th:text="${report.content}">내용</td>
+    </tr>
+    <tr>
+        <th>처리상태</th>
+        <td th:text="${report.status}">RECEIVED</td>
+    </tr>
+    <tr>
+        <th>작성자</th>
+        <td th:text="${report.user.loginId}">test</td>
+    </tr>
+    <tr>
+        <th>작성일</th>
+        <td th:text="${report.createdAt}">2026-06-06</td>
+    </tr>
+    <tr>
+        <th>수정일</th>
+        <td th:text="${report.updatedAt}">2026-06-06</td>
+    </tr>
+    <tr>
+        <th>관리자 답변</th>
+        <td th:text="${report.answer != null ? report.answer : '아직 답변이 없습니다.'}">아직 답변이 없습니다.</td>
+    </tr>
+    <tr>
+        <th>답변일</th>
+        <td th:text="${report.answeredAt != null ? report.answeredAt : '-'}">2026-06-06</td>
+    </tr>
+</table>
+
+<a th:href="@{/admin/reports}">목록으로</a>
+
+</body>
+</html>

@@ -52,4 +52,10 @@ public class ErrorReportService {
         return errorReportRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    @Transactional(readOnly = true)
+    public ErrorReport findReportById(Long id){
+        return errorReportRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고입니다."));
+    }
+
 }
