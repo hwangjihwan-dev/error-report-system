@@ -52,7 +52,7 @@ public class ErrorReport {
         this.user = user;
         this.title = title;
         this.content = content;
-        this.status = ReportStatus.RECIEVD;
+        this.status = ReportStatus.RECEIVED;
         this.createdAt = LocalDateTime.now();
     }
 }

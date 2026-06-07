@@ -8,6 +8,7 @@ import com.hwang.errorreport.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.View;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class ErrorReportService {
 
     private final ErrorReportRepository errorReportRepository;
     private final UserRepository userRepository;
+    private final View error;
 
     public Long createReport(String loginId, ReportCreateRequest request){
         User user = userRepository.findByLoginId(loginId)
@@ -37,6 +39,17 @@ public class ErrorReportService {
     @Transactional(readOnly = true)
     public List<ErrorReport> findMyReports(String loginId){
         return errorReportRepository.findByUserLoginIdOrderByCreatedAtDesc(loginId);
+    }
+
+    @Transactional(readOnly = true)
+    public ErrorReport findMyReport(Long reportId, String loginId){
+        return errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
+                .orElseThrow(()-> new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ErrorReport> findAllReports(){
+        return errorReportRepository.findAllByOrderByCreatedAtDesc();
     }
 
 }
