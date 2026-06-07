@@ -7,7 +7,7 @@
 <body>
 <h1>관리자 오류신고 목록</h1>
 
-<a th:href="@{/static}">메인으로</a>
+<a th:href="@{/}">메인으로</a>
 
 <table border="1">
     <thead>
@@ -16,7 +16,9 @@
         <th>작성자</th>
         <th>제목</th>
         <th>처리상태</th>
+        <th>답변여부</th>
         <th>등록일시</th>
+        <th>상세</th>
     </tr>
     </thead>
     <tbody>
@@ -27,8 +29,19 @@
             <a th:href="@{/admin/reports/{id}(id=${report.id})}"
                th:text="${report.title}">제목</a>
         </td>
-        <td th:text="${report.status}">처리상태</td>
+        <td>
+            <span th:if="${report.status.name() == 'RECEIVED'}">접수</span>
+            <span th:if="${report.status.name() == 'IN_PROGRESS'}">처리중</span>
+            <span th:if="${report.status.name() == 'COMPLETED'}">완료</span>
+        </td>
+        <td>
+            <span th:if="${report.status.name() == 'COMPLETED'}">답변완료</span>
+            <span th:if="${report.status.name() != 'COMPLETED'}">미답변</span>
+        </td>
         <td th:text="${report.createdAt}">2026-05T10:00</td>
+        <td>
+            <a th:href="@{/admin/reports/{id}(id=${report.id})}">상세보기</a>
+        </td>
     </tr>
     </tbody>
 </table>
