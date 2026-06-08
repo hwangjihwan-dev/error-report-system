@@ -8,7 +8,6 @@ import com.hwang.errorreport.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.View;
 
 import java.util.List;
 
@@ -19,7 +18,6 @@ public class ErrorReportService {
 
     private final ErrorReportRepository errorReportRepository;
     private final UserRepository userRepository;
-    private final View error;
 
     public Long createReport(String loginId, ReportCreateRequest request){
         User user = userRepository.findByLoginId(loginId)
