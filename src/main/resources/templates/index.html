@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>오류신고 관리 시스템</title>
@@ -12,7 +14,14 @@
 <form th:action="@{/logout}" method="post">
     <button type="submit">로그아웃</button>
 </form>
-<a th:href="@{/reports}">내 오류신고 목록</a>
-<a th:href="@{/reports/new}">오류신고 등록</a>
+<li sec:authorize="hasRole('USER')">
+    <a th:href="@{/reports}">내 오류신고 목록</a>
+</li>
+<li sec:authorize="hasRole('USER')">
+    <a th:href="@{/reports/new}">오류신고 등록</a>
+</li>
+<li sec:authorize="hasRole('ADMIN')">
+    <a th:href="@{/admin/reports}">관리자 오류신고 관리</a>
+</li>
 </body>
 </html>

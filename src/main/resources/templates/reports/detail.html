@@ -11,7 +11,9 @@
     <p><strong>ID:</strong> <span th:text="${report.id}">1</span></p>
     <p><strong>제목:</strong> <span th:text="${report.title}">제목</span></p>
     <p><strong>내용:</strong> <span th:text="${report.content}">내용</span></p>
-    <p><strong>처리상태:</strong> <span th:text="${report.status}">처리상태</span></p>
+    <p><strong>처리상태:</strong>
+        <span th:text="${report.status.description}">접수</span>
+    </p>
     <p><strong>등록일시:</strong> <span th:text="${report.createdAt}">2026-06-05T10:00</span></p>
 </div>
 
@@ -21,7 +23,7 @@
     <h2>관리자 답변</h2>
 
     <div th:if="${report.answer == null}">
-        <p>아직 등록된 답변이 없습니다.</p>
+        <p>아직 관리자 답변이 등록되지 않았습니다.</p>
     </div>
 
     <div th:if="${report.answer != null}">

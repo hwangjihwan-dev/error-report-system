@@ -25,7 +25,7 @@
         <td>
             <a th:href="@{/reports/{id}(id=${report.id})}" th:text="${report.title}">제목</a>
         </td>
-        <td th:text="${report.status}">처리상태</td>
+        <td th:text="${report.status.description}">접수</td>
         <td th:text="${report.createdAt}">2026-05T10:00</td>
     </tr>
     </tbody>
