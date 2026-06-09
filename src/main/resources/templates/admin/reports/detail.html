@@ -46,6 +46,30 @@
     </tr>
 </table>
 
+<div th:if="${report.status.name() == 'COMPLETED'}">
+    <h2>관리자 답변 수정</h2>
+
+    <form th:action="@{/admin/reports/{id}/answer(id=${report.id})}"
+          th:object="${reportAnswerRequest}"
+          method="post">
+        <div>
+            <label for="answerEdit">답변 내용</label><br>
+
+            <textarea id="answerEdit"
+                      th:field="*{answer}"
+                      rows="8"
+                      cols="80"
+                      placeholder="답변 내용을 입력하세요">
+            </textarea>
+            <div th:if="${#fields.hasErrors('answer')}"
+            th:errors="*{answer}">
+                답변 오류 메시지
+            </div>
+        </div>
+        <br>
+        <button type="submit">답변수정</button>
+    </form>
+</div>
 <div th:if="${report.status.name() != 'COMPLETED'}">
     <h2>관리자 답변 등록</h2>
 
@@ -62,7 +86,7 @@
                       placeholder="답변 내용을 입력하세요">
             </textarea>
             <div th:if="${#fields.hasErrors('answer')}"
-            th:errors="*{answer}">
+                 th:errors="*{answer}">
                 답변 오류 메시지
             </div>
         </div>

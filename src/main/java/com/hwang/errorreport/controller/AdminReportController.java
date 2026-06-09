@@ -30,6 +30,9 @@ public class AdminReportController {
     public String detailReport(@PathVariable Long id, Model model){
         ErrorReport report = errorReportService.findReportById(id);
 
+        ReportAnswerRequest reportAnswerRequest = new ReportAnswerRequest();
+        reportAnswerRequest.setAnswer(report.getAnswer());
+
         model.addAttribute("report", report);
         model.addAttribute("reportAnswerRequest", new ReportAnswerRequest());
 
@@ -53,5 +56,24 @@ public class AdminReportController {
         errorReportService.answerReport(id, request.getAnswer(), authentication.getName());
 
         return "redirect:/admin/reports/"+id;
+    }
+
+    @PostMapping("/admin/reports/{id}/answer/edit")
+    public String updateAnswer(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("reportAnswerRequest") ReportAnswerRequest request,
+            BindingResult bindingResult,
+            Authentication authentication,
+            Model model
+    ){
+        if(bindingResult.hasErrors()){
+            ErrorReport report = errorReportService.findReportById(id);
+            model.addAttribute("report", report);
+            return "admin/reports/detail";
+        }
+
+        errorReportService.updateAnswer(id, request.getAnswer(), authentication.getName());
+
+        return "redirect:/admin/reports/" + id;
     }
 }

@@ -63,4 +63,11 @@ public class ErrorReport {
         this.answeredAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void updateAnswer(String answer, User admin){
+        this.answer = answer;
+        this.admin = admin;
+        this.answeredAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
