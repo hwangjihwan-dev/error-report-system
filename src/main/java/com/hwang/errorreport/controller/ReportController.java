@@ -34,7 +34,7 @@ public class ReportController {
             Authentication authentication
     ){
         if(bindingResult.hasErrors()){
-            return "return/new";
+            return "reports/new";
         }
 
         String loginId = authentication.getName();

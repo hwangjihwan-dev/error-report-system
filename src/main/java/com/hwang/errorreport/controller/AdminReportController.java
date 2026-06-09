@@ -34,7 +34,7 @@ public class AdminReportController {
         reportAnswerRequest.setAnswer(report.getAnswer());
 
         model.addAttribute("report", report);
-        model.addAttribute("reportAnswerRequest", new ReportAnswerRequest());
+        model.addAttribute("reportAnswerRequest", reportAnswerRequest);
 
         return "admin/reports/detail";
     }
