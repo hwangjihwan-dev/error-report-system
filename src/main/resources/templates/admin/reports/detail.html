@@ -73,7 +73,7 @@
 <div th:if="${report.status.name() == 'COMPLETED'}">
     <h2>관리자 답변 수정</h2>
 
-    <form th:action="@{/admin/reports/{id}/answer(id=${report.id})}"
+    <form th:action="@{/admin/reports/{id}/answer/edit(id=${report.id})}"
           th:object="${reportAnswerRequest}"
           method="post">
         <div>
