@@ -1,6 +1,7 @@
 package com.hwang.errorreport.service;
 
 import com.hwang.errorreport.domain.report.ErrorReport;
+import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.domain.user.User;
 import com.hwang.errorreport.dto.report.ReportCreateRequest;
 import com.hwang.errorreport.repository.ErrorReportRepository;
@@ -56,23 +57,23 @@ public class ErrorReportService {
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고입니다."));
     }
 
-    public void answerReport(Long reportId,String answer, String adminLoginId) {
+    public void answerReport(Long reportId, String answer, ReportStatus status, String adminLoginId) {
         ErrorReport report = errorReportRepository.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 오류신고입니다."));
 
         User admin = userRepository.findByLoginId(adminLoginId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
 
-        report.answer(answer, admin);
+        report.answer(answer, status, admin);
     }
 
-    public void updateAnswer(Long reportId, String answer, String adminLoginId){
+    public void updateAnswer(Long reportId, String answer, ReportStatus status, String adminLoginId){
         ErrorReport report = errorReportRepository.findById(reportId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고 입니다."));
 
         User admin = userRepository.findByLoginId(adminLoginId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
 
-        report.updateAnswer(answer, admin);
+        report.updateAnswer(answer, status, admin);
     }
 }

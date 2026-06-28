@@ -56,17 +56,18 @@ public class ErrorReport {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void answer(String answer, User admin){
+    public void answer(String answer, ReportStatus status, User admin){
         this.answer = answer;
         this.admin = admin;
-        this.status = ReportStatus.COMPLETED;
+        this.status = status;
         this.answeredAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateAnswer(String answer, User admin){
+    public void updateAnswer(String answer, ReportStatus status, User admin){
         this.answer = answer;
         this.admin = admin;
+        this.status = status;
         this.answeredAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

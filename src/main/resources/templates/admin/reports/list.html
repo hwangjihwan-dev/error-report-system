@@ -31,8 +31,8 @@
         </td>
         <td th:text="${report.status.description}">접수</td>
         <td>
-            <span th:if="${report.status.name() == 'COMPLETED'}">답변완료</span>
-            <span th:if="${report.status.name() != 'COMPLETED'}">미답변</span>
+            <span th:if="${report.answer != null}">답변완료</span>
+            <span th:if="${report.answer == null}">미답변</span>
         </td>
         <td th:text="${report.createdAt}">2026-05T10:00</td>
         <td>

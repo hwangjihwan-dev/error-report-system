@@ -46,7 +46,7 @@
     </tr>
 </table>
 
-<div th:if="${report.status.name() != 'COMPLETED'}">
+<div th:if="${report.answer == null}">
     <h2>관리자 답변 등록</h2>
 
     <form th:action="@{/admin/reports/{id}/answer(id=${report.id})}"
@@ -66,11 +66,26 @@
                 답변 오류 메시지
             </div>
         </div>
+        <div>
+            <label for="statusCreate">처리상태</label><br>
+
+            <select id="statusCreate" th:field="*{status}">
+                <option th:each="status : ${statuses}"
+                        th:value="${status}"
+                        th:text="${status.description}">
+                    접수
+                </option>
+            </select>
+            <div th:if="${#fields.hasErrors('status')}"
+                 th:errors="*{status}">
+                처리상태 오류 메시지
+            </div>
+        </div>
         <br>
         <button type="submit">답변등록</button>
     </form>
 </div>
-<div th:if="${report.status.name() == 'COMPLETED'}">
+<div th:if="${report.answer != null}">
     <h2>관리자 답변 수정</h2>
 
     <form th:action="@{/admin/reports/{id}/answer/edit(id=${report.id})}"
@@ -88,6 +103,20 @@
             <div th:if="${#fields.hasErrors('answer')}"
                  th:errors="*{answer}">
                 답변 오류 메시지
+            </div>
+            <div>
+                <label for="statusEdit">처리상태</label><br>
+                <select id="statusEdit" th:field="*{status}">
+                    <option th:each="status : ${statuses}"
+                            th:value="${status}"
+                            th:text="${status.description}">
+                        접수
+                    </option>
+                </select>
+                <div th:if="${#fields.hasErrors('status')}"
+                     th:errors="*{status}">
+                    처리상태 오류 메시지
+                </div>
             </div>
         </div>
         <br>

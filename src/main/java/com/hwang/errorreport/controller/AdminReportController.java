@@ -1,6 +1,7 @@
 package com.hwang.errorreport.controller;
 
 import com.hwang.errorreport.domain.report.ErrorReport;
+import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.dto.report.ReportAnswerRequest;
 import com.hwang.errorreport.service.ErrorReportService;
 import jakarta.validation.Valid;
@@ -32,9 +33,11 @@ public class AdminReportController {
 
         ReportAnswerRequest reportAnswerRequest = new ReportAnswerRequest();
         reportAnswerRequest.setAnswer(report.getAnswer());
+        reportAnswerRequest.setStatus(report.getStatus());
 
         model.addAttribute("report", report);
         model.addAttribute("reportAnswerRequest", reportAnswerRequest);
+        model.addAttribute("statuses", ReportStatus.values());
 
         return "admin/reports/detail";
     }
@@ -50,10 +53,15 @@ public class AdminReportController {
         if(bindingResult.hasErrors()){
             ErrorReport report = errorReportService.findReportById(id);
             model.addAttribute("report", report);
+            model.addAttribute("statuses", ReportStatus.values());
             return "admin/reports/detail";
         }
 
-        errorReportService.answerReport(id, request.getAnswer(), authentication.getName());
+        errorReportService.answerReport(
+                id,
+                request.getAnswer(),
+                request.getStatus(),
+                authentication.getName());
 
         return "redirect:/admin/reports/"+id;
     }
@@ -69,10 +77,15 @@ public class AdminReportController {
         if(bindingResult.hasErrors()){
             ErrorReport report = errorReportService.findReportById(id);
             model.addAttribute("report", report);
+            model.addAttribute("statuses", ReportStatus.values());
             return "admin/reports/detail";
         }
 
-        errorReportService.updateAnswer(id, request.getAnswer(), authentication.getName());
+        errorReportService.updateAnswer(
+                id,
+                request.getAnswer(),
+                request.getStatus(),
+                authentication.getName());
 
         return "redirect:/admin/reports/" + id;
     }
