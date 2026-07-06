@@ -7,6 +7,8 @@ import com.hwang.errorreport.dto.report.ReportCreateRequest;
 import com.hwang.errorreport.repository.ErrorReportRepository;
 import com.hwang.errorreport.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,8 +49,8 @@ public class ErrorReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<ErrorReport> findAllReports(){
-        return errorReportRepository.findAllByOrderByCreatedAtDesc();
+    public Page<ErrorReport> findAllReports(Pageable pageable){
+        return errorReportRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     @Transactional(readOnly = true)

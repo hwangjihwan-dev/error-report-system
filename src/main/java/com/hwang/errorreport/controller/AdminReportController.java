@@ -6,14 +6,14 @@ import com.hwang.errorreport.dto.report.ReportAnswerRequest;
 import com.hwang.errorreport.service.ErrorReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,8 +21,14 @@ public class AdminReportController {
     private final ErrorReportService errorReportService;
 
     @GetMapping("/admin/reports")
-    public String listReports(Model model){
-        model.addAttribute("reports", errorReportService.findAllReports());
+    public String listReports(@RequestParam(defaultValue = "0") int page,
+                              Model model){
+        Pageable pageable = PageRequest.of(page,10);
+
+        Page<ErrorReport> reportPage = errorReportService.findAllReports(pageable);
+
+        model.addAttribute("reports", reportPage.getContent());
+        model.addAttribute("reportPage", reportPage);
 
         return "admin/reports/list";
     }

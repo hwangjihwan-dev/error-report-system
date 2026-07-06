@@ -1,6 +1,8 @@
 package com.hwang.errorreport.repository;
 
 import com.hwang.errorreport.domain.report.ErrorReport;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,4 +14,6 @@ public interface ErrorReportRepository extends JpaRepository<ErrorReport, Long> 
     Optional<ErrorReport> findByIdAndUserLoginId(Long id, String loginId);
 
     List<ErrorReport> findAllByOrderByCreatedAtDesc();
+
+    Page<ErrorReport> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }
