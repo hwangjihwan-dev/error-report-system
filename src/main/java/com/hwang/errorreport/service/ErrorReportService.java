@@ -38,8 +38,8 @@ public class ErrorReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<ErrorReport> findMyReports(String loginId){
-        return errorReportRepository.findByUserLoginIdOrderByCreatedAtDesc(loginId);
+    public Page<ErrorReport> findMyReports(String loginId, Pageable pageable){
+        return errorReportRepository.findByUserLoginIdOrderByCreatedAtDesc(loginId, pageable);
     }
 
     @Transactional(readOnly = true)

@@ -1,16 +1,17 @@
 package com.hwang.errorreport.controller;
 
+import com.hwang.errorreport.domain.report.ErrorReport;
 import com.hwang.errorreport.dto.report.ReportCreateRequest;
 import com.hwang.errorreport.service.ErrorReportService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class ReportController {
@@ -45,10 +46,17 @@ public class ReportController {
     }
 
     @GetMapping("/reports")
-    public String listReports(Authentication authentication, Model model){
+    public String listReports(@RequestParam(defaultValue = "0") int page,
+                              Authentication authentication,
+                              Model model){
         String loginId = authentication.getName();
 
-        model.addAttribute("reports", errorReportService.findMyReports(loginId));
+        Pageable pageable = PageRequest.of(page,10);
+
+        Page<ErrorReport> reportPage = errorReportService.findMyReports(loginId, pageable);
+
+        model.addAttribute("reports", reportPage.getContent());
+        model.addAttribute("reportPage", reportPage);
 
         return "reports/list";
     }

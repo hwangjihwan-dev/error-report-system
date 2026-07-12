@@ -31,6 +31,23 @@
     </tbody>
 </table>
 
+<div th:if="${reportPage.totalPages > 0}">
+    <a th:if="${reportPage.hasPrevious()}"
+       th:href="@{/reports(page=${reportPage.number - 1})}">
+       이전
+    </a>
+    <span>
+        <span th:text="${reportPage.number + 1}">1</span>
+        /
+        <span th:text="${reportPage.totalPages}">1</span>
+    </span>
+
+    <a th:if="${reportPage.hasNext()}"
+       th:href="@{/reports(page=${reportPage.number + 1})}">
+        다음
+    </a>
+</div>
+
 <p th:if="${#lists.isEmpty(reports)}">등록된 오류신고가 없습니다.</p>
 
 </body>

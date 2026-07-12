@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ErrorReportRepository extends JpaRepository<ErrorReport, Long> {
-    List<ErrorReport> findByUserLoginIdOrderByCreatedAtDesc(String loginId);
+    Page<ErrorReport> findByUserLoginIdOrderByCreatedAtDesc(String loginId, Pageable pageable);
 
     Optional<ErrorReport> findByIdAndUserLoginId(Long id, String loginId);
 
