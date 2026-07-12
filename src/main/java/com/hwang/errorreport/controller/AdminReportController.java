@@ -22,13 +22,16 @@ public class AdminReportController {
 
     @GetMapping("/admin/reports")
     public String listReports(@RequestParam(defaultValue = "0") int page,
+                              @RequestParam(required = false) ReportStatus status,
                               Model model){
         Pageable pageable = PageRequest.of(page,10);
 
-        Page<ErrorReport> reportPage = errorReportService.findAllReports(pageable);
+        Page<ErrorReport> reportPage = errorReportService.findReports(status, pageable);
 
         model.addAttribute("reports", reportPage.getContent());
         model.addAttribute("reportPage", reportPage);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("statuses", ReportStatus.values());
 
         return "admin/reports/list";
     }

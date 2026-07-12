@@ -54,6 +54,14 @@ public class ErrorReportService {
     }
 
     @Transactional(readOnly = true)
+    public Page<ErrorReport> findReports(ReportStatus status, Pageable pageable){
+        if(status == null){
+            return errorReportRepository.findAllByOrderByCreatedAtDesc(pageable);
+        }
+        return errorReportRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public ErrorReport findReportById(Long id){
         return errorReportRepository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고입니다."));

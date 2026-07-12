@@ -8,7 +8,19 @@
 <h1>관리자 오류신고 목록</h1>
 
 <a th:href="@{/}">메인으로</a>
-
+<div>
+    <a th:href="@{/admin/reports}"
+       th:style="${selectedStatus == null} ? 'font-weight:bold;' : ''">
+        전체
+    </a>
+    <span th:each="status : ${statuses}">
+        <a  th:href="@{/admin/reports(status=${status})}"
+        th:text="${status.description}"
+        th:style="${selectedStatus == null} ? 'font-weight:bold;' : ''">
+        처리상태
+        </a>
+    </span>
+</div>
 <table border="1">
     <thead>
     <tr>
@@ -43,7 +55,7 @@
 </table>
 <div th:if="${reportPage.totalElements > 0}">
     <a th:if="${reportPage.hasPrevious()}"
-       th:href="@{/admin/reports(page=${reportPage.number - 1})}">
+       th:href="@{/admin/reports(page=${reportPage.number - 1}, status=${selectedStatus})}">
         이전
     </a>
     <span>
@@ -53,7 +65,7 @@
     </span>
 
     <a th:if="${reportPage.hasNext()}"
-       th:href="@{/admin/reports(page=${reportPage.number + 1})}">
+       th:href="@{/admin/reports(page=${reportPage.number + 1}, status=${selectedStatus})}">
         다음
     </a>
 </div>
