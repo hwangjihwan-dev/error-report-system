@@ -19,4 +19,18 @@ public interface ErrorReportRepository extends JpaRepository<ErrorReport, Long> 
     List<ErrorReport> findAllByOrderByCreatedAtDesc();
 
     Page<ErrorReport> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    Page<ErrorReport> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
+            String titleKeyword,
+            String contentKeyword,
+            Pageable pageable
+    );
+
+    Page<ErrorReport> findByStatusAndTitleContainingIgnoreCaseOrStatusAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
+            ReportStatus titleStatus,
+            String titleKeyword,
+            ReportStatus contentStatus,
+            String contentKeyword,
+            Pageable pageable
+    );
 }

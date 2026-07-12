@@ -54,11 +54,31 @@ public class ErrorReportService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ErrorReport> findReports(ReportStatus status, Pageable pageable){
-        if(status == null){
+    public Page<ErrorReport> findReports(ReportStatus status, String keyword, Pageable pageable){
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+
+        if(status == null && !hasKeyword){
             return errorReportRepository.findAllByOrderByCreatedAtDesc(pageable);
         }
-        return errorReportRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
+
+        if(status != null && !hasKeyword){
+            return errorReportRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
+        }
+
+        if(status == null){
+            return errorReportRepository
+                    .findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
+                            keyword,
+                            keyword,
+                            pageable
+                    );
+        }
+        return errorReportRepository.findByStatusAndTitleContainingIgnoreCaseOrStatusAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
+                status,
+                keyword,
+                status,
+                keyword,
+                pageable);
     }
 
     @Transactional(readOnly = true)
