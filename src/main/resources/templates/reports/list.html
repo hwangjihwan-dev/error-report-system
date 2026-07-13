@@ -10,6 +10,17 @@
 <a th:href="@{/reports/new}">오류신고 등록</a>
 <a th:href="@{/}">메인으로</a>
 
+<form th:action="@{/reports}" method="get">
+    <input type="text"
+           name="keyword"
+           th:value="${keyword}"
+           placeholder="제목 또는 내용 검색">
+
+    <button type="submit">검색</button>
+
+    <a th:href="@{/reports}">초기화</a>
+</form>
+
 <table border="1">
     <thead>
     <tr>
@@ -33,7 +44,7 @@
 
 <div th:if="${reportPage.totalPages > 0}">
     <a th:if="${reportPage.hasPrevious()}"
-       th:href="@{/reports(page=${reportPage.number - 1})}">
+       th:href="@{/reports(page=${reportPage.number - 1}, keyword=${keyword})}">
        이전
     </a>
     <span>
@@ -43,7 +54,7 @@
     </span>
 
     <a th:if="${reportPage.hasNext()}"
-       th:href="@{/reports(page=${reportPage.number + 1})}">
+       th:href="@{/reports(page=${reportPage.number + 1}, keyword=${keyword})}">
         다음
     </a>
 </div>

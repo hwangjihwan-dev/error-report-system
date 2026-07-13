@@ -33,4 +33,12 @@ public interface ErrorReportRepository extends JpaRepository<ErrorReport, Long> 
             String contentKeyword,
             Pageable pageable
     );
+
+    Page<ErrorReport> findByUserLoginIdAndTitleContainingIgnoreCaseOrUserLoginIdAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
+            String titleLoginId,
+            String titleKeyword,
+            String contentLoginId,
+            String contentKeyword,
+            Pageable pageable
+    );
 }

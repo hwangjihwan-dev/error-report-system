@@ -38,8 +38,20 @@ public class ErrorReportService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ErrorReport> findMyReports(String loginId, Pageable pageable){
-        return errorReportRepository.findByUserLoginIdOrderByCreatedAtDesc(loginId, pageable);
+    public Page<ErrorReport> findMyReports(String loginId, String keyword, Pageable pageable){
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+
+        if(!hasKeyword){
+            return errorReportRepository.findByUserLoginIdOrderByCreatedAtDesc(loginId, pageable);
+        }
+        return errorReportRepository.
+                findByUserLoginIdAndTitleContainingIgnoreCaseOrUserLoginIdAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
+                        loginId,
+                        keyword,
+                        loginId,
+                        keyword,
+                        pageable
+                );
     }
 
     @Transactional(readOnly = true)

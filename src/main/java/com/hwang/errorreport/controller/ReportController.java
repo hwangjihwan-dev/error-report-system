@@ -47,16 +47,18 @@ public class ReportController {
 
     @GetMapping("/reports")
     public String listReports(@RequestParam(defaultValue = "0") int page,
+                              @RequestParam(required = false) String keyword,
                               Authentication authentication,
                               Model model){
         String loginId = authentication.getName();
 
         Pageable pageable = PageRequest.of(page,10);
 
-        Page<ErrorReport> reportPage = errorReportService.findMyReports(loginId, pageable);
+        Page<ErrorReport> reportPage = errorReportService.findMyReports(loginId, keyword, pageable);
 
         model.addAttribute("reports", reportPage.getContent());
         model.addAttribute("reportPage", reportPage);
+        model.addAttribute("keyword", keyword);
 
         return "reports/list";
     }
