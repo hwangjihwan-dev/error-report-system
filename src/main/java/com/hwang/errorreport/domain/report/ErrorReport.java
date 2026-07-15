@@ -56,6 +56,16 @@ public class ErrorReport {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void update(String title, String content){
+        this.title = title;
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean hasAnswer(){
+        return this.answer != null && this.answer.isBlank();
+    }
+
     public void answer(String answer, ReportStatus status, User admin){
         this.answer = answer;
         this.admin = admin;

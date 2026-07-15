@@ -2,6 +2,7 @@ package com.hwang.errorreport.controller;
 
 import com.hwang.errorreport.domain.report.ErrorReport;
 import com.hwang.errorreport.dto.report.ReportCreateRequest;
+import com.hwang.errorreport.dto.report.ReportUpdateRequest;
 import com.hwang.errorreport.service.ErrorReportService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -73,6 +74,46 @@ public class ReportController {
         model.addAttribute("report", errorReportService.findMyReport(id, loginId));
 
         return "reports/detail";
+    }
+
+    @GetMapping("/reports/{id}/edit")
+    public String editForm(@PathVariable Long id,
+                           Authentication authentication,
+                           Model model){
+        String loginId = authentication.getName();
+
+        ErrorReport report = errorReportService.findMyReportForEdit(id, loginId);
+
+        ReportUpdateRequest reportUpdateRequest = new ReportUpdateRequest();
+        reportUpdateRequest.setTitle(report.getTitle());
+        reportUpdateRequest.setContent(report.getContent());
+
+        model.addAttribute("report", report);
+        model.addAttribute("reportUpdateRequest", reportUpdateRequest);
+
+        return "reports/edit";
+    }
+
+    @PostMapping("/reports/{id}/edit")
+    public String updateReport(@PathVariable Long id,
+                               @Valid @ModelAttribute("reportUpdateRequest") ReportUpdateRequest request,
+                               BindingResult bindingResult,
+                               Authentication authentication,
+                               Model model){
+        if(bindingResult.hasErrors()){
+            String loginId = authentication.getName();
+            ErrorReport report = errorReportService.findMyReportForEdit(id, loginId);
+
+            model.addAttribute("report", report);
+
+            return "reports/edit";
+        }
+
+        String loginId = authentication.getName();
+
+        errorReportService.updateMyReport(id, loginId, request);
+
+        return "redirect:/reports/"+id;
     }
 
 }

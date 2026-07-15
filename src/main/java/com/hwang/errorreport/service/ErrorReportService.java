@@ -4,6 +4,7 @@ import com.hwang.errorreport.domain.report.ErrorReport;
 import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.domain.user.User;
 import com.hwang.errorreport.dto.report.ReportCreateRequest;
+import com.hwang.errorreport.dto.report.ReportUpdateRequest;
 import com.hwang.errorreport.repository.ErrorReportRepository;
 import com.hwang.errorreport.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,17 @@ public class ErrorReportService {
     public ErrorReport findMyReport(Long reportId, String loginId){
         return errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
                 .orElseThrow(()-> new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public ErrorReport findMyReportForEdit(Long reportId, String loginId){
+        ErrorReport report = errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
+                .orElseThrow(()->new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+        if(report.hasAnswer()){
+            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 수정할 수 없습니다.");
+        }
+
+        return report;
     }
 
     @Transactional(readOnly = true)
@@ -117,5 +129,16 @@ public class ErrorReportService {
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
 
         report.updateAnswer(answer, status, admin);
+    }
+
+    public void updateMyReport(Long reportId, String loginId, ReportUpdateRequest request){
+        ErrorReport report = errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
+                .orElseThrow(()->new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+
+        if(report.hasAnswer()){
+            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 수정할 수 없습니다.");
+        }
+
+        report.update(request.getTitle(), request.getContent());
     }
 }

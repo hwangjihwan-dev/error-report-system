@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오류신고 수정</title>
+</head>
+<body>
+<h1>오류신고 수정</h1>
+
+<form th:action="@{/reports/{id}/edit(id=${report.id})}"
+      th:object="${reportUpdateRequest}"
+      method="post">
+    <div>
+        <label for="title">제목</label><br>
+        <input type ="text"
+               id="title"
+               th:field="*{title}"
+               placeholder="제목을 입력하세요">
+        <div th:if="${#fields.hasErrors('title')}"
+             th:errors="*{title}">
+            제목 오류 메시지
+        </div>
+    </div>
+
+    <br>
+    <div>
+        <label for="content">내용</label><br>
+        <textarea id="content"
+                  th:field="*{content}"
+                    rows="10"
+                    cols="80"
+                    placeholder="내용을 입력하세요"></textarea>
+        <div th:if="${#fields.hasErrors('content')}"
+            th:errors="*{content}">
+            내용 오류 메시지
+        </div>
+    </div>
+
+    <br>
+
+    <button type="submit">수정</button>
+    <a th:href="@{/reports/{id}(id=${report.id})}">취소</a>
+</form>
+
+</body>
+</html>

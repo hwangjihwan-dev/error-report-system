@@ -35,6 +35,13 @@
     </div>
 </div>
 
+<div th:if="${#strings.isEmpty(report.answer)}">
+    <a th:href="@{/reports/{id}/edit(id=${report.id})}">
+        오류신고 수정
+    </a>
+
+</div>
+
 <a th:href="@{/reports}">목록으로</a>
 <a th:href="@{/}">메인으로</a>
 </body>
