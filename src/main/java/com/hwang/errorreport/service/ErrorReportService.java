@@ -141,4 +141,15 @@ public class ErrorReportService {
 
         report.update(request.getTitle(), request.getContent());
     }
+
+    public void deleteMyReport(Long reportId, String loginId){
+        ErrorReport report = errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
+                .orElseThrow(() -> new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+
+        if(report.hasAnswer()){
+            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 삭제할 수 없습니다.");
+        }
+
+        errorReportRepository.delete(report);
+    }
 }

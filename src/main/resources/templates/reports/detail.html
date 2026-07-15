@@ -40,8 +40,15 @@
         오류신고 수정
     </a>
 
+    <form th:action="@{/reports/{id}/delete(id=${report.id})}"
+          method="post"
+          style="display: inline">
+        <button type="submit"
+                onclick="return confirm('정말 삭제하시겠습니까?')">
+            오류신고 삭제
+        </button>
+    </form>
 </div>
-
 <a th:href="@{/reports}">목록으로</a>
 <a th:href="@{/}">메인으로</a>
 </body>

@@ -13,14 +13,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.View;
 
 @Controller
 public class ReportController {
 
     private final ErrorReportService errorReportService;
+    private final View error;
 
-    public ReportController(ErrorReportService errorReportService) {
+    public ReportController(ErrorReportService errorReportService, View error) {
         this.errorReportService = errorReportService;
+        this.error = error;
     }
 
     @GetMapping("/reports/new")
@@ -114,6 +117,17 @@ public class ReportController {
         errorReportService.updateMyReport(id, loginId, request);
 
         return "redirect:/reports/"+id;
+    }
+
+    @PostMapping("/reports/{id}/delete")
+    public String deleteReport(@PathVariable Long id,
+                               Authentication authentication){
+
+        String loginId = authentication.getName();
+
+        errorReportService.deleteMyReport(id, loginId);
+
+        return "redirect:/reports";
     }
 
 }
