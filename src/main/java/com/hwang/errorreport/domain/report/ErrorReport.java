@@ -63,7 +63,7 @@ public class ErrorReport {
     }
 
     public boolean hasAnswer(){
-        return this.answer != null && this.answer.isBlank();
+        return this.answer != null && !this.answer.isBlank();
     }
 
     public void answer(String answer, ReportStatus status, User admin){
