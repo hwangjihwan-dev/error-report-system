@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,8 +23,9 @@ public class ErrorReportService {
 
     private final ErrorReportRepository errorReportRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
-    public Long createReport(String loginId, ReportCreateRequest request){
+    public Long createReport(String loginId, ReportCreateRequest request, MultipartFile file){
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -33,6 +35,16 @@ public class ErrorReportService {
                 request.getContent()
         );
 
+        FileStorageService.StoredFile storedFile = fileStorageService.storeFile(file);
+
+        if(storedFile != null){
+            errorReport.attachFile(
+                    storedFile.getOriginalFileName(),
+                    storedFile.getStoredFileName(),
+                    storedFile.getFilePath(),
+                    storedFile.getFileSize()
+            );
+        }
         ErrorReport savedReport = errorReportRepository.save(errorReport);
 
         return savedReport.getId();

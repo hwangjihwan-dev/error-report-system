@@ -48,6 +48,18 @@ public class ErrorReport {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "original_file_name", length = 255)
+    private String originalFileName;
+
+    @Column(name = "stored_file_name", length = 255)
+    private String storedFileName;
+
+    @Column(name = "file_path", length = 500)
+    private String filePath;
+
+    @Column(name = "file_size")
+    private Long fileSize;
+
     public ErrorReport(User user, String title, String content){
         this.user = user;
         this.title = title;
@@ -80,5 +92,21 @@ public class ErrorReport {
         this.status = status;
         this.answeredAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void attachFile(String originalFileName,
+                           String storedFileName,
+                           String filePath,
+                           Long fileSize){
+
+        this.originalFileName = originalFileName;
+        this.storedFileName = storedFileName;
+        this.filePath = filePath;
+        this.fileSize = fileSize;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean hasAttachment(){
+        return this.originalFileName != null && !this.originalFileName.isBlank();
     }
 }

@@ -10,6 +10,13 @@
 <div>
     <p><strong>ID:</strong> <span th:text="${report.id}">1</span></p>
     <p><strong>제목:</strong> <span th:text="${report.title}">제목</span></p>
+    <strong>첨부파일</strong>
+    <span th:if="${!report.hasAttachment()}">첨부파일 없음</span>
+    <a th:if="${report.hasAttachment()}"
+          th:href="@{/reports/{id}/attachment(id=${report.id})}"
+          th:text="${report.originalFileName}">
+        첨부파일명
+    </a>
     <p><strong>내용:</strong> <span th:text="${report.content}">내용</span></p>
     <p><strong>처리상태:</strong>
         <span th:text="${report.status.description}">접수</span>

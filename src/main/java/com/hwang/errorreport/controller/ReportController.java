@@ -5,15 +5,25 @@ import com.hwang.errorreport.dto.report.ReportCreateRequest;
 import com.hwang.errorreport.dto.report.ReportUpdateRequest;
 import com.hwang.errorreport.service.ErrorReportService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.View;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 public class ReportController {
@@ -36,6 +46,7 @@ public class ReportController {
             @Valid
             @ModelAttribute ReportCreateRequest reportCreateRequest,
             BindingResult bindingResult,
+            @RequestParam(required = false) MultipartFile file,
             Authentication authentication
     ){
         if(bindingResult.hasErrors()){
@@ -44,7 +55,7 @@ public class ReportController {
 
         String loginId = authentication.getName();
 
-        Long reportId = errorReportService.createReport(loginId, reportCreateRequest);
+        Long reportId = errorReportService.createReport(loginId, reportCreateRequest, file);
 
         return "redirect:/reports/" + reportId;
     }
@@ -130,4 +141,34 @@ public class ReportController {
         return "redirect:/reports";
     }
 
+    @GetMapping("/reports/{id}/attachment")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable Long id,
+                                                       Authentication authentication){
+        String loginId = authentication.getName();
+
+        ErrorReport report = errorReportService.findMyReport(id, loginId);
+
+        if(!report.hasAttachment()){
+            throw new IllegalStateException("첨부파일이 없습니다.");
+        }
+
+        try{
+            File file = new File(report.getFilePath());
+            Resource resource = new UrlResource(file.toURI());
+
+            if(!resource.exists() || !resource.isReadable()){
+                throw new IllegalStateException("첨부파일을 읽을 수 없습니다.");
+            }
+
+            String encodedFileName = URLEncoder.encode(report.getOriginalFileName(), StandardCharsets.UTF_8)
+                    .replace("\\+", "%20");
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\""+ encodedFileName+ "\"")
+                    .body(resource);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("파일 다운로드 중 오류가 발생했습니다.", e);
+        }
+    }
 }
