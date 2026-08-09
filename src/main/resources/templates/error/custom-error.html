@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>오류 발생</title>
+</head>
+<body>
+<h1>요청을 처리할 수 없습니다.</h1>
+
+<p th:text="${message}">오류 메시지</p>
+
+<a th:href="@{/}">메인으로</a>
+<a th:href="@{/reports}">내 오류신고 목록으로</a>
+
+</body>
