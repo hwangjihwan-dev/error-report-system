@@ -6,14 +6,23 @@ import com.hwang.errorreport.dto.report.ReportAnswerRequest;
 import com.hwang.errorreport.service.ErrorReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequiredArgsConstructor
@@ -99,5 +108,33 @@ public class AdminReportController {
                 authentication.getName());
 
         return "redirect:/admin/reports/" + id;
+    }
+
+    @GetMapping("/admin/reports/{id}/attachment")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable Long id){
+        ErrorReport errorReport = errorReportService.findReportById(id);
+
+        if(!errorReport.hasAttachment()){
+            throw new IllegalArgumentException("첨부파일이 없습니다.");
+        }
+
+        try{
+            File file = new File(errorReport.getFilePath());
+            Resource resource = new UrlResource(file.toURI());
+
+            if(!resource.exists() || !resource.isReadable()){
+                throw new IllegalStateException("첨부파일을 읽을 수 없습니다.");
+            }
+
+            String encodedFileName = URLEncoder.encode(errorReport.getOriginalFileName(), StandardCharsets.UTF_8)
+                    .replaceAll("\\+","%20");
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + encodedFileName +"\"")
+                    .body(resource);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("파일 다운로드 중 오류가 발생했습니다.", e);
+        }
     }
 }
