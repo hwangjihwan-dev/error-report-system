@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -14,11 +15,17 @@ public class FileStorageService {
     private static final String UPLOAD_DIR =
             System.getProperty("user.dir") + File.separator + "uploads";
 
+    private static final long MAX_FILE_SIZE = 20 * 1024 * 1024;
+
+    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif", "pdf", "txt", "zip");
+
     public StoredFile storeFile(MultipartFile file){
 
         if(file == null || file.isEmpty()){
             return null;
         }
+
+        validateFile(file);
 
         File dir = new File(UPLOAD_DIR);
 
@@ -46,6 +53,34 @@ public class FileStorageService {
                 filePath,
                 file.getSize()
         );
+    }
+
+    private void validateFile(MultipartFile file){
+        if(file.getSize() > MAX_FILE_SIZE){
+            throw new IllegalArgumentException("첨부파일은 20MB 이하만 업로드할 수 있습니다.");
+        }
+
+        String originalFileName = file.getOriginalFilename();
+
+        if(originalFileName == null || originalFileName.isBlank()){
+            throw new IllegalArgumentException("파일명이 올바르지 않습니다.");
+        }
+
+        String extension = getExtension(originalFileName);
+
+        if(!ALLOWED_EXTENSIONS.contains(extension)){
+            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다.");
+        }
+    }
+
+    private String getExtension(String fileName){
+        int dotIndex = fileName.lastIndexOf(".");
+
+        if(dotIndex == -1 || dotIndex == fileName.length() - 1){
+            throw new IllegalArgumentException("확장자가 없는 파일은 업로드 할 수 없습니다.");
+        }
+
+        return fileName.substring(dotIndex + 1).toLowerCase();
     }
 
     @Getter
