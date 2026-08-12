@@ -156,15 +156,26 @@ public class ErrorReportService {
 
         report.update(request.getTitle(), request.getContent());
 
-        FileStorageService.StoredFile storedFile = fileStorageService.storeFile(file);
+        if(file != null && !file.isEmpty()){
+            String oldFilePath = report.getFilePath();
 
-        if(storedFile != null){
+            FileStorageService.StoredFile storedFile = fileStorageService.storeFile(file);
+
             report.attachFile(
                     storedFile.getOriginalFileName(),
                     storedFile.getStoredFileName(),
                     storedFile.getFilePath(),
                     storedFile.getFileSize()
             );
+            fileStorageService.deleteFile(oldFilePath);
+            return;
+        }
+        if(request.isDeleteAttachment() && report.hasAttachment()){
+            String oldFilePath = report.getFilePath();
+
+            report.removeAttachment();
+
+            fileStorageService.deleteFile(oldFilePath);
         }
     }
 

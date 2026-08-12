@@ -109,4 +109,12 @@ public class ErrorReport {
     public boolean hasAttachment(){
         return this.originalFileName != null && !this.originalFileName.isBlank();
     }
+
+    public void removeAttachment(){
+        this.originalFileName = null;
+        this.storedFileName = null;
+        this.filePath = null;
+        this.fileSize = null;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
