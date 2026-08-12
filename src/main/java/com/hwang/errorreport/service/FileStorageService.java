@@ -101,7 +101,7 @@ public class FileStorageService {
         return fileName.substring(dotIndex + 1).toLowerCase();
     }
 
-    public ResponseEntity<Resource> downloadFile(String filePath, String orginalFileName){
+    public ResponseEntity<Resource> downloadFile(String filePath, String originalFileName){
         if(filePath == null || filePath.isBlank()){
             throw new IllegalArgumentException("첨부파일이 없습니다.");
         }
@@ -114,7 +114,7 @@ public class FileStorageService {
                 throw new IllegalStateException("첨부파일을 읽을 수 없습니다.");
             }
 
-            String encodedFileName = URLEncoder.encode(orginalFileName, StandardCharsets.UTF_8)
+            String encodedFileName = URLEncoder.encode(originalFileName, StandardCharsets.UTF_8)
                     .replaceAll("\\+","%20");
 
             return ResponseEntity.ok()
