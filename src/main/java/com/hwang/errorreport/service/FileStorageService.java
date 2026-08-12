@@ -73,6 +73,17 @@ public class FileStorageService {
         }
     }
 
+    public void deleteFile(String filePath){
+        if(filePath == null || filePath.isBlank()){
+            return;
+        }
+        File file = new File(filePath);
+
+        if(file.exists() && !file.delete()){
+            throw new IllegalArgumentException("첨부파일 삭제 중 오류가 발생했습니다.");
+        }
+    }
+
     private String getExtension(String fileName){
         int dotIndex = fileName.lastIndexOf(".");
 

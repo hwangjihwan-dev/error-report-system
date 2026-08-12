@@ -176,6 +176,10 @@ public class ErrorReportService {
             throw new IllegalStateException("관리자 답변이 등록된 오류신고는 삭제할 수 없습니다.");
         }
 
+        if(report.hasAttachment()){
+            fileStorageService.deleteFile(report.getFilePath());
+        }
+
         errorReportRepository.delete(report);
     }
 }
