@@ -108,6 +108,7 @@ public class ReportController {
         return "reports/edit";
     }
 
+/*    첨부파일 추가 전
     @PostMapping("/reports/{id}/edit")
     public String updateReport(@PathVariable Long id,
                                @Valid @ModelAttribute("reportUpdateRequest") ReportUpdateRequest request,
@@ -126,6 +127,28 @@ public class ReportController {
         String loginId = authentication.getName();
 
         errorReportService.updateMyReport(id, loginId, request);
+
+        return "redirect:/reports/"+id;
+    }*/
+    @PostMapping("/reports/{id}/edit")
+    public String updateReport(@PathVariable Long id,
+                               @Valid @ModelAttribute("reportUpdateRequest") ReportUpdateRequest request,
+                               BindingResult bindingResult,
+                               @RequestParam(required = false) MultipartFile file,
+                               Authentication authentication,
+                               Model model){
+        if(bindingResult.hasErrors()){
+            String loginId = authentication.getName();
+            ErrorReport report = errorReportService.findMyReportForEdit(id, loginId);
+
+            model.addAttribute("report", report);
+
+            return "reports/edit";
+        }
+
+        String loginId = authentication.getName();
+
+        errorReportService.updateMyReport(id, loginId, request, file);
 
         return "redirect:/reports/"+id;
     }

@@ -9,7 +9,8 @@
 
 <form th:action="@{/reports/{id}/edit(id=${report.id})}"
       th:object="${reportUpdateRequest}"
-      method="post">
+      method="post"
+      enctype="multipart/form-data">
     <div>
         <label for="title">제목</label><br>
         <input type ="text"
@@ -34,6 +35,22 @@
             th:errors="*{content}">
             내용 오류 메시지
         </div>
+    </div>
+    <div>
+        <strong>현재 첨부파일</strong>
+        <span th:if="${!report.hasAttachment()}">
+            첨부파일 없음
+        </span>
+
+        <span th:if="${report.hasAttachment()}"
+              th:text="${report.originalFileName}">
+            기존 첨부파일명
+        </span>
+    </div>
+    <div>
+        <label for="file">새 첨부파일</label>
+        <input type="file" id="file" name="file">
+        <p>새 파일을 선택하지 않으면 기존 첨부파일이 유지됩니다.</p>
     </div>
 
     <br>

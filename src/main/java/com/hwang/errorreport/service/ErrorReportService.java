@@ -143,7 +143,10 @@ public class ErrorReportService {
         report.updateAnswer(answer, status, admin);
     }
 
-    public void updateMyReport(Long reportId, String loginId, ReportUpdateRequest request){
+    public void updateMyReport(Long reportId,
+                               String loginId,
+                               ReportUpdateRequest request,
+                               MultipartFile file){
         ErrorReport report = errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
                 .orElseThrow(()->new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
 
@@ -152,6 +155,17 @@ public class ErrorReportService {
         }
 
         report.update(request.getTitle(), request.getContent());
+
+        FileStorageService.StoredFile storedFile = fileStorageService.storeFile(file);
+
+        if(storedFile != null){
+            report.attachFile(
+                    storedFile.getOriginalFileName(),
+                    storedFile.getStoredFileName(),
+                    storedFile.getFilePath(),
+                    storedFile.getFileSize()
+            );
+        }
     }
 
     public void deleteMyReport(Long reportId, String loginId){
