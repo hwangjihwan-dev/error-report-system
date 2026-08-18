@@ -193,4 +193,22 @@ public class ErrorReportService {
 
         errorReportRepository.delete(report);
     }
+
+    public void rejectReport(Long reportId, String rejectReason, String adminLoginId){
+        ErrorReport report = errorReportRepository.findById(reportId)
+                .orElseThrow(()->new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+
+        if(report.hasAnswer()){
+            throw new IllegalStateException("이미 답변이 등록된 오류신고는 반려할 수 없습니다.");
+        }
+
+        if(report.getStatus() == ReportStatus.REJECTED){
+            throw new IllegalStateException("이미 반려된 오류신고입니다.");
+        }
+
+        User admin = userRepository.findByLoginId(adminLoginId)
+                .orElseThrow(()->new IllegalArgumentException("관리자 정보를 찾을 수 없습니다."));
+
+        report.reject(rejectReason, admin);
+    }
 }

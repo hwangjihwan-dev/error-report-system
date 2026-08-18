@@ -35,6 +35,9 @@ public class ErrorReport {
     @Column(columnDefinition = "TEXT")
     private String answer;
 
+    @Column(name = "reject_reason", columnDefinition = "TEXT")
+    private String rejectReason;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
     private User admin;
@@ -115,6 +118,15 @@ public class ErrorReport {
         this.storedFileName = null;
         this.filePath = null;
         this.fileSize = null;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void reject(String rejectReason, User admin){
+        this.answer = null;
+        this.rejectReason = rejectReason;
+        this.status = ReportStatus.REJECTED;
+        this.admin = admin;
+        this.answeredAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 }

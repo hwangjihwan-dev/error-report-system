@@ -3,6 +3,7 @@ package com.hwang.errorreport.controller;
 import com.hwang.errorreport.domain.report.ErrorReport;
 import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.dto.report.ReportAnswerRequest;
+import com.hwang.errorreport.dto.report.ReportRejectRequest;
 import com.hwang.errorreport.service.ErrorReportService;
 import com.hwang.errorreport.service.FileStorageService;
 import jakarta.validation.Valid;
@@ -52,6 +53,7 @@ public class AdminReportController {
 
         model.addAttribute("report", report);
         model.addAttribute("reportAnswerRequest", reportAnswerRequest);
+        model.addAttribute("reportRejectRequest", new ReportRejectRequest());
         model.addAttribute("statuses", ReportStatus.values());
 
         return "admin/reports/detail";
@@ -79,6 +81,37 @@ public class AdminReportController {
                 authentication.getName());
 
         return "redirect:/admin/reports/"+id;
+    }
+
+    @PostMapping("/admin/reports/{id}/reject")
+    public String rejeectReport(@PathVariable Long id,
+                                @Valid @ModelAttribute("reportRejectRequest") ReportRejectRequest request,
+                                BindingResult bindingResult,
+                                Authentication authentication,
+                                Model model){
+        if(bindingResult.hasErrors()){
+            ErrorReport report = errorReportService.findReportById(id);
+
+            ReportAnswerRequest reportAnswerRequest = new ReportAnswerRequest();
+            reportAnswerRequest.setAnswer(report.getAnswer());
+            reportAnswerRequest.setStatus(report.getStatus());
+
+            model.addAttribute("report", report);
+            model.addAttribute("reportAnswerRequest", reportAnswerRequest);
+            model.addAttribute("statuses", ReportStatus.values());
+
+            return "admin/reports/detail";
+        }
+
+        String adminLoginId = authentication.getName();
+
+        errorReportService.rejectReport(
+                id,
+                request.getRejectReason(),
+                adminLoginId
+        );
+
+        return "redirect:/admin/reports/" + id;
     }
 
     @PostMapping("/admin/reports/{id}/answer/edit")
