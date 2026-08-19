@@ -81,6 +81,10 @@ public class ErrorReport {
         return this.answer != null && !this.answer.isBlank();
     }
 
+    public boolean isRejected(){
+        return this.status == ReportStatus.REJECTED;
+    }
+
     public void answer(String answer, ReportStatus status, User admin){
         this.answer = answer;
         this.admin = admin;

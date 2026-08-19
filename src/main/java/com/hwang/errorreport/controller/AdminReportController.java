@@ -19,6 +19,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class AdminReportController {
@@ -54,7 +56,7 @@ public class AdminReportController {
         model.addAttribute("report", report);
         model.addAttribute("reportAnswerRequest", reportAnswerRequest);
         model.addAttribute("reportRejectRequest", new ReportRejectRequest());
-        model.addAttribute("statuses", ReportStatus.values());
+        model.addAttribute("statuses", answerStatuses());
 
         return "admin/reports/detail";
     }
@@ -149,6 +151,14 @@ public class AdminReportController {
         return fileStorageService.downloadFile(
                 errorReport.getFilePath(),
                 errorReport.getOriginalFileName()
+        );
+    }
+
+    private List<ReportStatus> answerStatuses(){
+        return List.of(
+                ReportStatus.RECEIVED,
+                ReportStatus.IN_PROGRESS,
+                ReportStatus.COMPLETED
         );
     }
 }

@@ -28,12 +28,24 @@
 
 <div>
     <h2>관리자 답변</h2>
-
-    <div th:if="${report.answer == null}">
+    <div th:if="${report.status.name() == 'REJECTED'}">
+        <h3>반려 정보</h3>
+        <p>
+            <strong>반려 사유</strong>
+            <span th:text="${report.rejectReason}">
+                반려 사유
+            </span>
+        </p>
+        <p>
+            <strong>반려 처리일시</strong>
+            <span th:text="${report.answeredAt}">2026-08-20T09:00</span>
+        </p>
+    </div>
+    <div th:if="${report.status.name() != 'REJECTED' and report.answer == null}">
         <p>아직 관리자 답변이 등록되지 않았습니다.</p>
     </div>
 
-    <div th:if="${report.answer != null}">
+    <div th:if="${report.status.name() != 'REJECTED' and report.answer == null}">
         <p th:text="${report.answer}">답변내용</p>
         <p>
             <strong>답변일시</strong>
@@ -42,7 +54,7 @@
     </div>
 </div>
 
-<div th:if="${#strings.isEmpty(report.answer)}">
+<div th:if="${#strings.isEmpty(report.answer) and !report.isRejected()}">
     <a th:href="@{/reports/{id}/edit(id=${report.id})}">
         오류신고 수정
     </a>

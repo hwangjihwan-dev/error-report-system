@@ -68,7 +68,7 @@
     </tr>
 </table>
 
-<div th:if="${report.answer == null}">
+<div th:if="${report.answer == null and report.status.name() != 'REJECTED'}">
     <h2>관리자 답변 등록</h2>
 
     <form th:action="@{/admin/reports/{id}/answer(id=${report.id})}"

@@ -81,6 +81,10 @@ public class ErrorReportService {
             throw new IllegalStateException("관리자 답변이 등록된 오류신고는 수정할 수 없습니다.");
         }
 
+        if(report.isRejected()){
+            throw new IllegalStateException("반려된 오류신고는 수정할 수 없습니다.");
+        }
+
         return report;
     }
 
@@ -154,6 +158,10 @@ public class ErrorReportService {
             throw new IllegalStateException("관리자 답변이 등록된 오류신고는 수정할 수 없습니다.");
         }
 
+        if(report.isRejected()){
+            throw new IllegalStateException("반려된 오류신고는 수정할 수 없습니다.");
+        }
+
         report.update(request.getTitle(), request.getContent());
 
         if(file != null && !file.isEmpty()){
@@ -185,6 +193,10 @@ public class ErrorReportService {
 
         if(report.hasAnswer()){
             throw new IllegalStateException("관리자 답변이 등록된 오류신고는 삭제할 수 없습니다.");
+        }
+
+        if(report.isRejected()){
+            throw new IllegalStateException("반려된 오류신고는 삭제할 수 없습니다.");
         }
 
         if(report.hasAttachment()){
