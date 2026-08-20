@@ -57,6 +57,7 @@ public class AdminReportController {
         model.addAttribute("reportAnswerRequest", reportAnswerRequest);
         model.addAttribute("reportRejectRequest", new ReportRejectRequest());
         model.addAttribute("statuses", answerStatuses());
+        model.addAttribute("histories", errorReportService.findHistories(id));
 
         return "admin/reports/detail";
     }
@@ -73,6 +74,8 @@ public class AdminReportController {
             ErrorReport report = errorReportService.findReportById(id);
             model.addAttribute("report", report);
             model.addAttribute("statuses", ReportStatus.values());
+            model.addAttribute("histories", errorReportService.findHistories(id));
+
             return "admin/reports/detail";
         }
 
@@ -101,6 +104,7 @@ public class AdminReportController {
             model.addAttribute("report", report);
             model.addAttribute("reportAnswerRequest", reportAnswerRequest);
             model.addAttribute("statuses", ReportStatus.values());
+            model.addAttribute("histories", errorReportService.findHistories(id));
 
             return "admin/reports/detail";
         }
@@ -128,6 +132,8 @@ public class AdminReportController {
             ErrorReport report = errorReportService.findReportById(id);
             model.addAttribute("report", report);
             model.addAttribute("statuses", ReportStatus.values());
+            model.addAttribute("histories", errorReportService.findHistories(id));
+
             return "admin/reports/detail";
         }
 

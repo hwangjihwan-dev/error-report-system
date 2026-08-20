@@ -1,10 +1,12 @@
 package com.hwang.errorreport.service;
 
 import com.hwang.errorreport.domain.report.ErrorReport;
+import com.hwang.errorreport.domain.report.ErrorReportHistory;
 import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.domain.user.User;
 import com.hwang.errorreport.dto.report.ReportCreateRequest;
 import com.hwang.errorreport.dto.report.ReportUpdateRequest;
+import com.hwang.errorreport.repository.ErrorReportHistoryRepository;
 import com.hwang.errorreport.repository.ErrorReportRepository;
 import com.hwang.errorreport.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class ErrorReportService {
     private final ErrorReportRepository errorReportRepository;
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
+    private final ErrorReportHistoryRepository errorReportHistoryRepository;
 
     public Long createReport(String loginId, ReportCreateRequest request, MultipartFile file){
         User user = userRepository.findByLoginId(loginId)
@@ -134,17 +137,37 @@ public class ErrorReportService {
         User admin = userRepository.findByLoginId(adminLoginId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
 
+        ReportStatus previousStatus = report.getStatus();
+
         report.answer(answer, status, admin);
+
+        errorReportHistoryRepository.save(new ErrorReportHistory(
+                report,
+                admin,
+                previousStatus,
+                status,
+                answer
+        ));
     }
 
     public void updateAnswer(Long reportId, String answer, ReportStatus status, String adminLoginId){
         ErrorReport report = errorReportRepository.findById(reportId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고 입니다."));
 
+        ReportStatus previousStatus = report.getStatus();
+
         User admin = userRepository.findByLoginId(adminLoginId)
                 .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
 
         report.updateAnswer(answer, status, admin);
+
+        errorReportHistoryRepository.save(new ErrorReportHistory(
+                report,
+                admin,
+                previousStatus,
+                status,
+                answer
+        ));
     }
 
     public void updateMyReport(Long reportId,
@@ -221,6 +244,20 @@ public class ErrorReportService {
         User admin = userRepository.findByLoginId(adminLoginId)
                 .orElseThrow(()->new IllegalArgumentException("관리자 정보를 찾을 수 없습니다."));
 
+        ReportStatus previousStatus = report.getStatus();
+
         report.reject(rejectReason, admin);
+
+        errorReportHistoryRepository.save(new ErrorReportHistory(
+                report,
+                admin,
+                previousStatus,
+                ReportStatus.REJECTED,
+                rejectReason
+        ));
+    }
+
+    public List<ErrorReportHistory> findHistories(Long reportId){
+        return errorReportHistoryRepository.findByReportIdOrderByCreatedAtDesc(reportId);
     }
 }

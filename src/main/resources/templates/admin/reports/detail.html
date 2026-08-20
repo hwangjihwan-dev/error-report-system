@@ -68,6 +68,33 @@
     </tr>
 </table>
 
+<h2>처리 이력</h2>
+<div th:if="${#lists.isEmpty(histories)}">
+    <p>처리 이력이 없습니다.</p>
+</div>
+<table border="1" th:if="${!#lists.isEmpty(histories)}">
+    <thead>
+    <tr>
+        <th>처리일시</th>
+        <th>관리자</th>
+        <th>상태 변경</th>
+        <th>내용</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="history : ${histories}">
+        <td th:text="${history.createdAt}">2026-08-21T08:35</td>
+        <td th:text="${history.admin.loginId}">admin</td>
+        <td>
+            <span th:text="${history.previousStatus.description}">접수</span>
+            →
+            <span th:text="${history.newStatus.description}">처리중</span>
+        </td>
+        <td th:text="${history.comment}">처리 내용</td>
+
+    </tr>
+    </tbody>
+</table>
 <div th:if="${report.answer == null and report.status.name() != 'REJECTED'}">
     <h2>관리자 답변 등록</h2>
 
