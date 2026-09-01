@@ -4,14 +4,17 @@ import com.hwang.errorreport.domain.report.ErrorReport;
 import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.dto.report.ReportAnswerRequest;
 import com.hwang.errorreport.dto.report.ReportRejectRequest;
+import com.hwang.errorreport.service.ErrorReportExcelService;
 import com.hwang.errorreport.service.ErrorReportService;
 import com.hwang.errorreport.service.FileStorageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -19,6 +22,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -26,6 +32,7 @@ import java.util.List;
 public class AdminReportController {
     private final ErrorReportService errorReportService;
     private final FileStorageService fileStorageService;
+    private final ErrorReportExcelService errorReportExcelService;
 
     @GetMapping("/admin/reports")
     public String listReports(@RequestParam(defaultValue = "0") int page,
@@ -166,5 +173,27 @@ public class AdminReportController {
                 ReportStatus.IN_PROGRESS,
                 ReportStatus.COMPLETED
         );
+    }
+
+    @GetMapping("/admin/reports/excel")
+    public ResponseEntity<Resource> downloadExcel(@RequestParam(required = false) ReportStatus status,
+                                                  @RequestParam(required = false) String keyword){
+
+        List<ErrorReport> reports = errorReportService.findReportsForExcel(status, keyword);
+
+        byte[] excelData = errorReportExcelService.createReportExcel(reports);
+
+        String fileName = "오류신고_목록_" + LocalDateTime.now() + ".xlsx";
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
+        ByteArrayResource resource = new ByteArrayResource(excelData);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + encodedFileName + "\"")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .body(resource);
     }
 }

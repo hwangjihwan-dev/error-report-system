@@ -260,4 +260,32 @@ public class ErrorReportService {
     public List<ErrorReportHistory> findHistories(Long reportId){
         return errorReportHistoryRepository.findByReportIdOrderByCreatedAtDesc(reportId);
     }
+
+    public List<ErrorReport> findReportsForExcel(ReportStatus status, String keyword){
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+
+        if(status != null && hasKeyword){
+            return errorReportRepository
+                    .findByStatusAndTitleContainingIgnoreCaseOrStatusAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
+                            status,
+                            keyword.trim(),
+                            status,
+                            keyword.trim()
+                    );
+        }
+
+        if(status != null){
+            return errorReportRepository.findByStatusOrderByCreatedAtDesc(status);
+        }
+
+        if(hasKeyword){
+            return errorReportRepository
+                    .findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
+                            keyword.trim(),
+                            keyword.trim()
+                    );
+        }
+
+        return errorReportRepository.findAllByOrderByCreatedAtDesc();
+    }
 }

@@ -31,6 +31,7 @@
 
     <a th:href="@{/admin/reports}">초기화</a>
 </form>
+<a th:href="@{/admin/reports/excel(status=${selectedStatus}, keyword=${keyword})}">엑셀 다운로드</a>
 <table border="1">
     <thead>
     <tr>
