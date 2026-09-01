@@ -55,4 +55,10 @@ public interface ErrorReportRepository extends JpaRepository<ErrorReport, Long> 
             String contentKeyword,
             Pageable pageable
     );
+
+    long countByStatus(ReportStatus status);
+
+    long countByAnswerIsNull();
+
+    long countByAnswerIsNotNull();
 }

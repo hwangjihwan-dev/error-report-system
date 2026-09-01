@@ -5,6 +5,7 @@ import com.hwang.errorreport.domain.report.ErrorReportHistory;
 import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.domain.user.User;
 import com.hwang.errorreport.dto.report.ReportCreateRequest;
+import com.hwang.errorreport.dto.report.ReportDashboardResponse;
 import com.hwang.errorreport.dto.report.ReportUpdateRequest;
 import com.hwang.errorreport.repository.ErrorReportHistoryRepository;
 import com.hwang.errorreport.repository.ErrorReportRepository;
@@ -287,5 +288,25 @@ public class ErrorReportService {
         }
 
         return errorReportRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public ReportDashboardResponse getDashboard(){
+        long totalCount = errorReportRepository.count();
+        long receivedCount = errorReportRepository.countByStatus(ReportStatus.RECEIVED);
+        long inProgressCount = errorReportRepository.countByStatus(ReportStatus.IN_PROGRESS);
+        long completedCount = errorReportRepository.countByStatus(ReportStatus.COMPLETED);
+        long rejectedCount = errorReportRepository.countByStatus(ReportStatus.REJECTED);
+        long unansweredCount = errorReportRepository.countByAnswerIsNull();
+        long answeredCount = errorReportRepository.countByAnswerIsNotNull();
+
+        return new ReportDashboardResponse(
+                totalCount,
+                receivedCount,
+                inProgressCount,
+                completedCount,
+                rejectedCount,
+                unansweredCount,
+                answeredCount
+        );
     }
 }
