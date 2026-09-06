@@ -7,9 +7,21 @@
 <body>
 <h1>요청을 처리할 수 없습니다.</h1>
 
-<p th:text="${message}">오류 메시지</p>
+<p>
+    <strong>상태 코드:</strong>
+    <span th:text="${status != null ? status : '-'}">400</span>
+</p>
+<p>
+    <strong>오류 메시지:</strong>
+    <span th:text="${message != null ? message : '알 수 없는 오류가 발생했습니다.'}">
+        알 수 없는 오류가 발생했습니다.
+    </span>
+</p>
 
 <a th:href="@{/}">메인으로</a>
+<br>
 <a th:href="@{/reports}">내 오류신고 목록으로</a>
+<br>
+<a th:href="@{/admin/reports}">관리자 오류신고 목록으로</a>
 
 </body>
