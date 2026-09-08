@@ -56,15 +56,12 @@ public class AdminReportController {
     public String detailReport(@PathVariable Long id, Model model){
         ErrorReport report = errorReportService.findReportById(id);
 
-        ReportAnswerRequest reportAnswerRequest = new ReportAnswerRequest();
-        reportAnswerRequest.setAnswer(report.getAnswer());
-        reportAnswerRequest.setStatus(report.getStatus());
-
-        model.addAttribute("report", report);
-        model.addAttribute("reportAnswerRequest", reportAnswerRequest);
-        model.addAttribute("reportRejectRequest", new ReportRejectRequest());
-        model.addAttribute("statuses", answerStatuses());
-        model.addAttribute("histories", errorReportService.findHistories(id));
+        addDetailModelAttributes(
+                model,
+                report,
+                createReportAnswerRequest(report),
+                new ReportRejectRequest()
+        );
 
         return "admin/reports/detail";
     }
@@ -79,9 +76,13 @@ public class AdminReportController {
     ){
         if(bindingResult.hasErrors()){
             ErrorReport report = errorReportService.findReportById(id);
-            model.addAttribute("report", report);
-            model.addAttribute("statuses", ReportStatus.values());
-            model.addAttribute("histories", errorReportService.findHistories(id));
+
+            addDetailModelAttributes(
+                    model,
+                    report,
+                    request,
+                    new ReportRejectRequest()
+            );
 
             return "admin/reports/detail";
         }
@@ -96,7 +97,7 @@ public class AdminReportController {
     }
 
     @PostMapping("/admin/reports/{id}/reject")
-    public String rejeectReport(@PathVariable Long id,
+    public String rejectReport(@PathVariable Long id,
                                 @Valid @ModelAttribute("reportRejectRequest") ReportRejectRequest request,
                                 BindingResult bindingResult,
                                 Authentication authentication,
@@ -105,13 +106,13 @@ public class AdminReportController {
             ErrorReport report = errorReportService.findReportById(id);
 
             ReportAnswerRequest reportAnswerRequest = new ReportAnswerRequest();
-            reportAnswerRequest.setAnswer(report.getAnswer());
-            reportAnswerRequest.setStatus(report.getStatus());
 
-            model.addAttribute("report", report);
-            model.addAttribute("reportAnswerRequest", reportAnswerRequest);
-            model.addAttribute("statuses", ReportStatus.values());
-            model.addAttribute("histories", errorReportService.findHistories(id));
+            addDetailModelAttributes(
+                    model,
+                    report,
+                    createReportAnswerRequest(report),
+                    request
+            );
 
             return "admin/reports/detail";
         }
@@ -137,9 +138,13 @@ public class AdminReportController {
     ){
         if(bindingResult.hasErrors()){
             ErrorReport report = errorReportService.findReportById(id);
-            model.addAttribute("report", report);
-            model.addAttribute("statuses", ReportStatus.values());
-            model.addAttribute("histories", errorReportService.findHistories(id));
+
+            addDetailModelAttributes(
+                    model,
+                    report,
+                    request,
+                    new ReportRejectRequest()
+            );
 
             return "admin/reports/detail";
         }
@@ -167,14 +172,6 @@ public class AdminReportController {
         );
     }
 
-    private List<ReportStatus> answerStatuses(){
-        return List.of(
-                ReportStatus.RECEIVED,
-                ReportStatus.IN_PROGRESS,
-                ReportStatus.COMPLETED
-        );
-    }
-
     @GetMapping("/admin/reports/excel")
     public ResponseEntity<Resource> downloadExcel(@RequestParam(required = false) ReportStatus status,
                                                   @RequestParam(required = false) String keyword){
@@ -195,5 +192,32 @@ public class AdminReportController {
                 .header(HttpHeaders.CONTENT_TYPE,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .body(resource);
+    }
+
+    private List<ReportStatus> answerStatuses(){
+        return List.of(
+                ReportStatus.RECEIVED,
+                ReportStatus.IN_PROGRESS,
+                ReportStatus.COMPLETED
+        );
+    }
+
+    private ReportAnswerRequest createReportAnswerRequest(ErrorReport report){
+        ReportAnswerRequest reportAnswerRequest = new ReportAnswerRequest();
+        reportAnswerRequest.setAnswer(report.getAnswer());
+        reportAnswerRequest.setStatus(report.getStatus());
+
+        return reportAnswerRequest;
+    }
+
+    private void addDetailModelAttributes(Model model,
+                                          ErrorReport report,
+                                          ReportAnswerRequest reportAnswerRequest,
+                                          ReportRejectRequest reportRejectRequest){
+        model.addAttribute("report", report);
+        model.addAttribute("reportAnswerRequest", reportAnswerRequest);
+        model.addAttribute("reportRejectRequest", reportRejectRequest);
+        model.addAttribute("statuses", answerStatuses());
+        model.addAttribute("histories", errorReportService.findHistories(report.getId()));
     }
 }
