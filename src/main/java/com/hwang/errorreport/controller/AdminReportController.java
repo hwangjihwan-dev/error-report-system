@@ -105,8 +105,6 @@ public class AdminReportController {
         if(bindingResult.hasErrors()){
             ErrorReport report = errorReportService.findReportById(id);
 
-            ReportAnswerRequest reportAnswerRequest = new ReportAnswerRequest();
-
             addDetailModelAttributes(
                     model,
                     report,

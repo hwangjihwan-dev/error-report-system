@@ -79,15 +79,9 @@ public class ErrorReportService {
 
     @Transactional(readOnly = true)
     public ErrorReport findMyReportForEdit(Long reportId, String loginId){
-        ErrorReport report = errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
-                .orElseThrow(()->new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
-        if(report.hasAnswer()){
-            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 수정할 수 없습니다.");
-        }
+        ErrorReport report = findMyReport(reportId, loginId);
 
-        if(report.isRejected()){
-            throw new IllegalStateException("반려된 오류신고는 수정할 수 없습니다.");
-        }
+        validateUpdatableReport(report);
 
         return report;
     }
@@ -132,59 +126,47 @@ public class ErrorReportService {
     }
 
     public void answerReport(Long reportId, String answer, ReportStatus status, String adminLoginId) {
-        ErrorReport report = errorReportRepository.findById(reportId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 오류신고입니다."));
-
-        User admin = userRepository.findByLoginId(adminLoginId)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+        ErrorReport report = getReport(reportId);
+        User admin = getAdmin(adminLoginId);
 
         ReportStatus previousStatus = report.getStatus();
 
         report.answer(answer, status, admin);
 
-        errorReportHistoryRepository.save(new ErrorReportHistory(
+        saveHistory(
                 report,
                 admin,
                 previousStatus,
                 status,
                 answer
-        ));
+        );
     }
 
     public void updateAnswer(Long reportId, String answer, ReportStatus status, String adminLoginId){
-        ErrorReport report = errorReportRepository.findById(reportId)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고 입니다."));
+        ErrorReport report = getReport(reportId);
+        User admin = getAdmin(adminLoginId);
 
         ReportStatus previousStatus = report.getStatus();
 
-        User admin = userRepository.findByLoginId(adminLoginId)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
-
         report.updateAnswer(answer, status, admin);
 
-        errorReportHistoryRepository.save(new ErrorReportHistory(
+        saveHistory(
                 report,
                 admin,
                 previousStatus,
                 status,
                 answer
-        ));
+        );
     }
 
     public void updateMyReport(Long reportId,
                                String loginId,
                                ReportUpdateRequest request,
                                MultipartFile file){
-        ErrorReport report = errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
-                .orElseThrow(()->new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
 
-        if(report.hasAnswer()){
-            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 수정할 수 없습니다.");
-        }
+        ErrorReport report = findMyReport(reportId, loginId);
 
-        if(report.isRejected()){
-            throw new IllegalStateException("반려된 오류신고는 수정할 수 없습니다.");
-        }
+        validateUpdatableReport(report);
 
         report.update(request.getTitle(), request.getContent());
 
@@ -212,16 +194,9 @@ public class ErrorReportService {
     }
 
     public void deleteMyReport(Long reportId, String loginId){
-        ErrorReport report = errorReportRepository.findByIdAndUserLoginId(reportId, loginId)
-                .orElseThrow(() -> new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+        ErrorReport report = findMyReport(reportId,loginId);
 
-        if(report.hasAnswer()){
-            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 삭제할 수 없습니다.");
-        }
-
-        if(report.isRejected()){
-            throw new IllegalStateException("반려된 오류신고는 삭제할 수 없습니다.");
-        }
+        validateDeletableReport(report);
 
         if(report.hasAttachment()){
             fileStorageService.deleteFile(report.getFilePath());
@@ -231,8 +206,7 @@ public class ErrorReportService {
     }
 
     public void rejectReport(Long reportId, String rejectReason, String adminLoginId){
-        ErrorReport report = errorReportRepository.findById(reportId)
-                .orElseThrow(()->new IllegalArgumentException("오류신고를 찾을 수 없습니다."));
+        ErrorReport report = getReport(reportId);
 
         if(report.hasAnswer()){
             throw new IllegalStateException("이미 답변이 등록된 오류신고는 반려할 수 없습니다.");
@@ -242,20 +216,19 @@ public class ErrorReportService {
             throw new IllegalStateException("이미 반려된 오류신고입니다.");
         }
 
-        User admin = userRepository.findByLoginId(adminLoginId)
-                .orElseThrow(()->new IllegalArgumentException("관리자 정보를 찾을 수 없습니다."));
+        User admin = getAdmin(adminLoginId);
 
         ReportStatus previousStatus = report.getStatus();
 
         report.reject(rejectReason, admin);
 
-        errorReportHistoryRepository.save(new ErrorReportHistory(
+        saveHistory(
                 report,
                 admin,
                 previousStatus,
                 ReportStatus.REJECTED,
                 rejectReason
-        ));
+        );
     }
 
     public List<ErrorReportHistory> findHistories(Long reportId){
@@ -308,5 +281,49 @@ public class ErrorReportService {
                 unansweredCount,
                 answeredCount
         );
+    }
+
+    private ErrorReport getReport(Long reportId){
+        return errorReportRepository.findById(reportId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 오류신고입니다."));
+    }
+
+    private User getAdmin(String adminLoginId){
+        return userRepository.findByLoginId(adminLoginId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+    }
+
+    private void saveHistory(ErrorReport report,
+                             User admin,
+                             ReportStatus previousStatus,
+                             ReportStatus newStatus,
+                             String comment){
+        errorReportHistoryRepository.save(new ErrorReportHistory(
+                report,
+                admin,
+                previousStatus,
+                newStatus,
+                comment
+        ));
+    }
+
+    private void validateUpdatableReport(ErrorReport report){
+        if(report.hasAnswer()){
+            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 수정할 수 없습니다.");
+        }
+
+        if(report.isRejected()){
+            throw new IllegalStateException("반려된 오류신고는 수정할 수 없습니다.");
+        }
+    }
+
+    private void validateDeletableReport(ErrorReport report){
+        if(report.hasAnswer()){
+            throw new IllegalStateException("관리자 답변이 등록된 오류신고는 삭제할 수 없습니다.");
+        }
+
+        if(report.isRejected()){
+            throw new IllegalStateException("반려된 오류신고는 삭제할 수 없습니다.");
+        }
     }
 }
