@@ -61,10 +61,7 @@ public class ErrorReportService {
         if(!hasKeyword){
             return errorReportRepository.findByUserLoginIdOrderByCreatedAtDesc(loginId, pageable);
         }
-        return errorReportRepository.
-                findByUserLoginIdAndTitleContainingIgnoreCaseOrUserLoginIdAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
-                        loginId,
-                        keyword,
+        return errorReportRepository.searchMyReports(
                         loginId,
                         keyword,
                         pageable
@@ -93,30 +90,13 @@ public class ErrorReportService {
 
     @Transactional(readOnly = true)
     public Page<ErrorReport> findReports(ReportStatus status, String keyword, Pageable pageable){
-        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
-
-        if(status == null && !hasKeyword){
-            return errorReportRepository.findAllByOrderByCreatedAtDesc(pageable);
-        }
-
-        if(status != null && !hasKeyword){
-            return errorReportRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
-        }
-
-        if(status == null){
-            return errorReportRepository
-                    .findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
-                            keyword,
-                            keyword,
-                            pageable
-                    );
-        }
-        return errorReportRepository.findByStatusAndTitleContainingIgnoreCaseOrStatusAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
+        String normalizedKeyword =
+                keyword == null || keyword.trim().isEmpty() ? "" : keyword.trim();
+        return errorReportRepository.searchReports(
                 status,
-                keyword,
-                status,
-                keyword,
-                pageable);
+                normalizedKeyword,
+                pageable
+        );
     }
 
     @Transactional(readOnly = true)
@@ -236,31 +216,13 @@ public class ErrorReportService {
     }
 
     public List<ErrorReport> findReportsForExcel(ReportStatus status, String keyword){
-        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        String normalizedKeyword =
+                keyword == null || keyword.trim().isEmpty() ? "" : keyword.trim();
 
-        if(status != null && hasKeyword){
-            return errorReportRepository
-                    .findByStatusAndTitleContainingIgnoreCaseOrStatusAndContentContainingIgnoreCaseOrderByCreatedAtDesc(
-                            status,
-                            keyword.trim(),
-                            status,
-                            keyword.trim()
-                    );
-        }
-
-        if(status != null){
-            return errorReportRepository.findByStatusOrderByCreatedAtDesc(status);
-        }
-
-        if(hasKeyword){
-            return errorReportRepository
-                    .findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
-                            keyword.trim(),
-                            keyword.trim()
-                    );
-        }
-
-        return errorReportRepository.findAllByOrderByCreatedAtDesc();
+        return errorReportRepository.searchReportsForExcel(
+                status,
+                normalizedKeyword
+        );
     }
 
     public ReportDashboardResponse getDashboard(){
