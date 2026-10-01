@@ -4,6 +4,7 @@ import com.hwang.errorreport.domain.report.ErrorReport;
 import com.hwang.errorreport.domain.report.ErrorReportHistory;
 import com.hwang.errorreport.domain.report.ReportStatus;
 import com.hwang.errorreport.domain.user.User;
+import com.hwang.errorreport.dto.report.ReportUpdateRequest;
 import com.hwang.errorreport.repository.ErrorReportHistoryRepository;
 import com.hwang.errorreport.repository.ErrorReportRepository;
 import com.hwang.errorreport.repository.UserRepository;
@@ -16,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -229,5 +229,127 @@ public class ErrorReportServiceTest {
                 .hasMessage("반려된 오류신고는 삭제할 수 없습니다.");
 
         verify(errorReportRepository, never()).delete(any(ErrorReport.class));
+    }
+
+    @Test
+    @DisplayName("답변이 없는 오류신고는 수정할 수 있다")
+    void canUpdateReportWhenNotAnswered(){
+        //given
+        ReportUpdateRequest request = new ReportUpdateRequest();
+        request.setTitle("수정된 제목");
+        request.setContent("수정된 내용");
+
+        when(errorReportRepository.findByIdAndUserLoginId(1L,"user1"))
+                .thenReturn(Optional.of(report));
+
+        //when
+        assertThatCode(()->
+                errorReportService.updateMyReport(
+                        1L,
+                        "user1",
+                        request,
+                        null
+                )
+        ).doesNotThrowAnyException();
+
+        //then
+        assertThat(report.getTitle()).isEqualTo("수정된 제목");
+        assertThat(report.getContent()).isEqualTo("수정된 내용");
+    }
+
+    @Test
+    @DisplayName("답변이 없는 오류신고는 삭제할 수 있다")
+    void canDeleteReportWhenNotAnswered(){
+        //given
+        when(errorReportRepository.findByIdAndUserLoginId(1L,"user1"))
+                .thenReturn(Optional.of(report));
+
+        //when
+        errorReportService.deleteMyReport(1L,"user1");
+
+        //then
+        verify(errorReportRepository, times(1))
+                .delete(report);
+    }
+
+    @Test
+    @DisplayName("관리자가 답변을 등록하면 처리 이력이 저장된다")
+    void answerReportSavesHistory(){
+        //given
+        when(errorReportRepository.findById(1L))
+                .thenReturn(Optional.of(report));
+
+        when(userRepository.findByLoginId("admin"))
+                .thenReturn(Optional.of(admin));
+
+        ArgumentCaptor<ErrorReportHistory> historyCaptor =
+                ArgumentCaptor.forClass(ErrorReportHistory.class);
+
+        //when
+        errorReportService.answerReport(
+                1L
+                ,"답변 내용입니다.",
+                ReportStatus.COMPLETED,
+                "admin"
+        );
+
+        //then
+        verify(errorReportHistoryRepository, times(1))
+                .save(historyCaptor.capture());
+
+        ErrorReportHistory savedHistory = historyCaptor.getValue();
+
+        assertThat(savedHistory.getPreviousStatus())
+                .isEqualTo(ReportStatus.RECEIVED);
+
+        assertThat(savedHistory.getNewStatus())
+                .isEqualTo(ReportStatus.COMPLETED);
+
+        assertThat(savedHistory.getComment())
+                .isEqualTo("답변 내용입니다.");
+    }
+
+    @Test
+    @DisplayName("관리자가 답변을 수정하면 처리 이력이 저장된다")
+    void updateAnswerSavesHistory(){
+        //given
+        report.answer(
+                "기존 답변",
+                ReportStatus.IN_PROGRESS,
+                admin
+        );
+
+        when(errorReportRepository.findById(1L))
+                .thenReturn(Optional.of(report));
+
+        when(userRepository.findByLoginId("admin"))
+                .thenReturn(Optional.of(admin));
+
+        ArgumentCaptor<ErrorReportHistory> historyCaptor =
+                ArgumentCaptor.forClass(ErrorReportHistory.class);
+
+
+        //when
+        errorReportService.updateAnswer(
+                1L,
+                "수정된 답변",
+                ReportStatus.COMPLETED,
+                "admin"
+        );
+
+        //then
+        verify(errorReportHistoryRepository, times(1))
+                .save(historyCaptor.capture());
+
+        ErrorReportHistory savedHistory = historyCaptor.getValue();
+
+        assertThat(savedHistory.getPreviousStatus())
+                .isEqualTo(ReportStatus.IN_PROGRESS);
+
+        assertThat(savedHistory.getNewStatus())
+                .isEqualTo(ReportStatus.COMPLETED);
+
+        assertThat(savedHistory.getComment())
+                .isEqualTo("수정된 답변");
     }
 }
