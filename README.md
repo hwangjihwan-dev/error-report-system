@@ -214,6 +214,6 @@ src
     └── java
         └── com.hwang.errorreport
             └── config
-                └── serviceConfigTest.java
+                └── SecurityConfigTest.java
             └── service
                 └── ErrorReportServiceTest.java
