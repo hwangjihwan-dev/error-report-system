@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.servlet.View;
 
 import java.util.List;
 
@@ -46,8 +45,6 @@ class SecurityConfigTest {
 
     @MockitoBean
     private ErrorReportExcelService errorReportExcelService;
-    @Autowired
-    private View error;
 
     @Test
     @DisplayName("일반 사용자는 관리자 페이지에 접근할 수 없다")
@@ -245,7 +242,7 @@ class SecurityConfigTest {
         when(errorReportService.findReportById(1L))
                 .thenReturn(report);
 
-        when(errorReportService.findHistories(null))
+        when(errorReportService.findHistories(1L))
                 .thenReturn(List.of());
 
         //when & then

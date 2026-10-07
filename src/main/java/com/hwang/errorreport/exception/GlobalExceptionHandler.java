@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
         response.setStatus(HttpStatus.METHOD_NOT_ALLOWED.value());
 
         model.addAttribute("message", "잘못된 요청 방식입니다. 화면의 버튼을 통해 다시 요청해주세요.");
-        model.addAttribute("status", HttpStatus.METHOD_NOT_ALLOWED);
+        model.addAttribute("status", HttpStatus.METHOD_NOT_ALLOWED.value());
         return "error/custom-error";
     }
 

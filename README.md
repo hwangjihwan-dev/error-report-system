@@ -8,9 +8,9 @@
 검색·필터·페이징, 반려 처리, 처리 이력 추적, 엑셀 다운로드,
 통계 대시보드와 공통 예외 처리를 구현했습니다.
 
-또한 주요 비즈니스 규칙을 서비스 계층에 두고
-JUnit 5, Mockito, AssertJ 기반 단위 테스트를 작성하여
-답변·반려 상태에 따른 수정/삭제 제한과 처리 이력 저장 로직을 검증했습니다.
+또한 JUnit 5, Mockito, AssertJ, MockMvc를 활용하여
+서비스 계층의 핵심 비즈니스 규칙과 Spring Security 기반 인증·인가,
+CSRF, 입력값 검증 및 주요 요청 흐름을 테스트했습니다.
 
 ---
 
@@ -148,6 +148,42 @@ JUnit 5, Mockito, AssertJ 기반 단위 테스트를 작성하여
 - AssertJ
 
 ---
+## 테스트
+
+### Service 테스트
+
+JUnit 5, Mockito, AssertJ를 활용하여
+서비스 계층의 핵심 비즈니스 규칙을 검증했습니다.
+
+주요 테스트 항목:
+
+- 관리자 답변이 등록된 오류신고 수정 제한
+- 반려된 오류신고 수정/삭제 제한
+- 답변이 등록된 오류신고 반려 제한
+- 답변 없는 오류신고 반려 성공
+- 반려 처리 시 상태 `REJECTED` 변경
+- 반려 처리 이력 저장
+- 답변 없는 오류신고 수정/삭제 성공
+- 관리자 답변 등록/수정 시 처리 이력 저장
+
+### Security / Controller 테스트
+
+MockMvc와 Spring Security Test를 활용하여
+인증·인가 및 주요 HTTP 요청 흐름을 검증했습니다.
+
+주요 테스트 항목:
+
+- 일반 사용자의 관리자 페이지 접근 제한
+- 관리자의 관리자 페이지 접근 허용
+- 비로그인 사용자의 보호 페이지 접근 제한
+- CSRF 토큰 없는 POST 요청 차단
+- CSRF 토큰이 있는 정상 POST 요청 처리
+- 잘못된 HTTP Method 요청 시 `405 Method Not Allowed`
+- 일반 사용자의 관리자 답변/반려 요청 차단
+- 관리자의 답변/반려 요청 처리
+- 답변/반려 사유 빈값 validation 실패 시 서비스 호출 방지
+
+---
 
 ## 프로젝트 구조
 
@@ -177,5 +213,7 @@ src
 └── test
     └── java
         └── com.hwang.errorreport
+            └── config
+                └── serviceConfigTest.java
             └── service
                 └── ErrorReportServiceTest.java
